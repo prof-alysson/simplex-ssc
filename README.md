@@ -2,6 +2,10 @@
 
 Aplicação Spring Boot que utiliza a biblioteca SSC (Software for Simplex Calculation) para resolver problemas de Programação Linear através do terminal.
 
+**Aula 11 - Otimização de Sistemas**
+**Prof. Alysson M. Bruno**
+**Universidade Estadual do Tocantins - Unitins**
+
 ## Requisitos
 
 - JDK 17 ou superior
@@ -59,17 +63,70 @@ java -jar target/ssc-terminal-app-1.0.0.jar
 
 A aplicação oferece um menu interativo no terminal com as seguintes opções:
 
-1. **Resolver exemplo de Programação Linear** - Problema de minimização
-   - Minimizar: 3x₁ + 2x₂
-   - Sujeito a: 2x₁ + x₂ ≥ 4, x₁ + 2x₂ ≥ 3, x₁, x₂ ≥ 0
+### 1. [AULA 11] Exemplo da Apresentação (Rotas) ⭐
+**Este é o exemplo principal usado na apresentação (arquivo `apresentacao.md`)**
 
-2. **Resolver exemplo de Maximização**
-   - Maximizar: 5x₁ + 4x₂
-   - Sujeito a: x₁ + x₂ ≤ 5, 3x₁ + x₂ ≤ 12, x₁, x₂ ≥ 0
+Problema de Otimização de Rotas:
+- **Maximizar**: Z = 5x₁ + 4x₂
+- **Sujeito a**:
+  - x₁ + x₂ ≤ 10 (capacidade total)
+  - 2x₁ + x₂ ≤ 16 (limite de recurso)
+  - x₁, x₂ ≥ 0
 
-3. **Resolver problema personalizado** (em desenvolvimento)
+**Solução esperada**: x₁ = 6, x₂ = 4, Z = 46
+
+Este exemplo corresponde exatamente à solução obtida manualmente com o Simplex Tableau apresentado na aula!
+
+### 2. Exemplo de Minimização
+- Minimizar: 3x₁ + 2x₂
+- Sujeito a: 2x₁ + x₂ ≥ 4, x₁ + 2x₂ ≥ 3, x₁, x₂ ≥ 0
+
+### 3. Exemplo de Maximização
+- Maximizar: 5x₁ + 4x₂
+- Sujeito a: x₁ + x₂ ≤ 5, 3x₁ + x₂ ≤ 12, x₁, x₂ ≥ 0
+
+### 4. Resolver problema personalizado
+(em desenvolvimento)
+
+## Material de Apoio
+
+### Apresentação da Aula
+O arquivo `apresentacao.md` contém uma apresentação completa (formato Marp) sobre:
+- Revisão de Programação Linear
+- Método Simplex e Simplex Tableau
+- Problema de Distribuição de Rotas
+- Resolução manual passo a passo
+- Implementação em Java com SSC
+
+Para visualizar a apresentação:
+```bash
+# Instale o Marp CLI
+npm install -g @marp-team/marp-cli
+
+# Gerar PDF
+marp apresentacao.md --pdf
+
+# Gerar HTML
+marp apresentacao.md --html
+
+# Ou use a extensão "Marp for VS Code"
+```
 
 ## Exemplos de Uso
+
+### Exemplo da Apresentação (Aula 11)
+```
+Maximizar: Z = 5x1 + 4x2
+Sujeito a:
+  x1 + x2 <= 10  (capacidade total)
+  2x1 + x2 <= 16 (limite de recurso)
+  x1, x2 >= 0
+
+Solução Ótima:
+  x1 = 6.00
+  x2 = 4.00
+  Z = 46.00
+```
 
 ### Exemplo de Minimização
 
