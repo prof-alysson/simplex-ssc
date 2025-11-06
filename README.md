@@ -155,22 +155,35 @@ Para adicionar seus próprios problemas de programação linear, edite o arquivo
 ### Exemplo de Código
 
 ```java
-LP lp = new LP();
+import org.ssclab.pl.milp.*;
 
-// Definir função objetivo (maximização ou minimização)
-lp.setObjFunctionMax(); // ou setObjFunctionMin()
-lp.setCObj(5, 4); // coeficientes da função objetivo
+// Criar função objetivo (maximização ou minimização)
+LinearObjectiveFunction objective = new LinearObjectiveFunction(
+    new double[]{5, 4},    // coeficientes da função objetivo
+    GoalType.MAX           // GoalType.MAX ou GoalType.MIN
+);
+
+// Criar lista de restrições
+ListConstraints constraints = new ListConstraints();
 
 // Adicionar restrições
-lp.addConstraint(new Constraint(ConsType.LE, 5), 1, 1);
-lp.addConstraint(new Constraint(ConsType.GE, 3), 2, 1);
+constraints.add(new Constraint(new double[]{1, 1}, ConsType.LE, 5));
+constraints.add(new Constraint(new double[]{2, 1}, ConsType.GE, 3));
 
-// Resolver
-Solution solution = lp.solve();
+// Criar e resolver o problema
+LP lp = new LP(objective, constraints);
+SolutionType result = lp.resolve();
 
 // Obter resultados
-double[] values = solution.getOptimalSolution();
-double optimal = solution.getOptimalValue();
+if (result == SolutionType.OPTIMAL) {
+    Solution solution = lp.getSolution();
+    double optimal = solution.getOptimumValue();
+
+    // Iterar sobre as variáveis
+    for (Variable var : solution.getVariables()) {
+        System.out.println(var.getName() + " = " + var.getValue());
+    }
+}
 ```
 
 ## Tipos de Restrições
@@ -182,7 +195,7 @@ double optimal = solution.getOptimalValue();
 ## Dependências Principais
 
 - Spring Boot 3.2.0
-- SSC-LP 3.2.0
+- SSC-LP 4.7.8
 
 ## Licença
 

@@ -13,8 +13,6 @@ footer: 'Prof. Alysson M. Bruno | Unitins | 2025.2'
 
 **Aula 11 - Otimização de Sistemas**
 Professor: Alysson M. Bruno
-Universidade Estadual do Tocantins - Unitins
-2025.2
 
 ---
 
@@ -401,15 +399,16 @@ https://www.ssclab.org/
 Adicione no `pom.xml`:
 
 ```xml
+<!-- https://mvnrepository.com/artifact/org.ssclab/SSC-LP -->
 <dependency>
     <groupId>org.ssclab</groupId>
-    <artifactId>ssc-lp</artifactId>
-    <version>3.2.0</version>
+    <artifactId>SSC-LP</artifactId>
+    <version>4.7.8</version>
 </dependency>
 ```
 
 ### Requisitos:
-- JDK 10 ou superior (recomendado JDK 17)
+- JDK 17 ou superior (recomendado JDK 23)
 - Maven 3.6+
 
 ---
@@ -421,22 +420,26 @@ import org.ssclab.pl.milp.*;
 
 public class SimplexExample {
     public static void main(String[] args) throws Exception {
-        // 1. Criar objeto LP
-        LP lp = new LP();
+        // 1. Criar função objetivo
+        LinearObjectiveFunction objective = new LinearObjectiveFunction(
+            new double[]{5, 4},    // coeficientes
+            GoalType.MAX           // MAX ou MIN
+        );
 
-        // 2. Definir função objetivo
-        lp.setObjFunctionMax(); // ou setObjFunctionMin()
-        lp.setCObj(5, 4);       // coeficientes
+        // 2. Criar lista de restrições
+        ListConstraints constraints = new ListConstraints();
+        constraints.add(new Constraint(new double[]{1, 1}, ConsType.LE, 10));
+        constraints.add(new Constraint(new double[]{2, 1}, ConsType.LE, 16));
 
-        // 3. Adicionar restrições
-        lp.addConstraint(new Constraint(ConsType.LE, 10), 1, 1);
-        lp.addConstraint(new Constraint(ConsType.LE, 16), 2, 1);
+        // 3. Criar e resolver o problema
+        LP lp = new LP(objective, constraints);
+        SolutionType result = lp.resolve();
 
-        // 4. Resolver
-        Solution solution = lp.solve();
-
-        // 5. Obter resultados
-        System.out.println("Valor ótimo: " + solution.getOptimalValue());
+        // 4. Obter resultados
+        if (result == SolutionType.OPTIMAL) {
+            Solution solution = lp.getSolution();
+            System.out.println("Valor ótimo: " + solution.getOptimumValue());
+        }
     }
 }
 ```
@@ -457,14 +460,14 @@ public class RotasOptimization {
         System.out.println("  x1 + x2 <= 10");
         System.out.println("  2x1 + x2 <= 16");
 
-        // Criar problema de PL
-        LP lp = new LP();
+        // Criar função objetivo (maximização)
+        LinearObjectiveFunction objective = new LinearObjectiveFunction(
+            new double[]{5, 4},   // coeficientes: 5x1 + 4x2
+            GoalType.MAX
+        );
 
-        // Definir como maximização
-        lp.setObjFunctionMax();
-
-        // Definir coeficientes da função objetivo: 5x1 + 4x2
-        lp.setCObj(5, 4);
+        // Criar lista de restrições
+        ListConstraints constraints = new ListConstraints();
 ```
 
 ---
@@ -473,22 +476,25 @@ public class RotasOptimization {
 
 ```java
         // Adicionar primeira restrição: x1 + x2 <= 10
-        lp.addConstraint(
-            new Constraint(ConsType.LE, 10),  // <= 10
-            1, 1                               // coeficientes: 1x1 + 1x2
-        );
+        constraints.add(new Constraint(
+            new double[]{1, 1},    // coeficientes: 1x1 + 1x2
+            ConsType.LE,           // <=
+            10                     // lado direito
+        ));
 
         // Adicionar segunda restrição: 2x1 + x2 <= 16
-        lp.addConstraint(
-            new Constraint(ConsType.LE, 16),  // <= 16
-            2, 1                               // coeficientes: 2x1 + 1x2
-        );
+        constraints.add(new Constraint(
+            new double[]{2, 1},    // coeficientes: 2x1 + 1x2
+            ConsType.LE,           // <=
+            16                     // lado direito
+        ));
 
-        // Resolver o problema
-        Solution solution = lp.solve();
+        // Criar e resolver o problema
+        LP lp = new LP(objective, constraints);
+        SolutionType result = lp.resolve();
 
         // Exibir resultados
-        exibirSolucao(solution);
+        exibirSolucao(lp, result);
     }
 ```
 
@@ -497,25 +503,26 @@ public class RotasOptimization {
 ## Exemplo Completo: Exibindo Resultados
 
 ```java
-    private void exibirSolucao(Solution solution) {
-        if (solution != null) {
-            System.out.println("\n========= SOLUÇÃO ÓTIMA =========");
+    private void exibirSolucao(LP lp, SolutionType result) {
+        System.out.println("\n========= SOLUÇÃO =========");
+        System.out.println("Status: " + result);
 
-            // Status da solução
-            System.out.println("Status: " + solution.getSolutionType());
+        if (result == SolutionType.OPTIMAL) {
+            Solution solution = lp.getSolution();
 
             // Valor ótimo da função objetivo
-            double valorOtimo = solution.getOptimalValue();
+            double valorOtimo = solution.getOptimumValue();
             System.out.printf("Valor Ótimo Z: %.2f\n", valorOtimo);
 
             // Valores das variáveis
-            double[] valores = solution.getOptimalSolution();
             System.out.println("\nValores das variáveis:");
-            for (int i = 0; i < valores.length; i++) {
-                System.out.printf("  x%d = %.2f\n", (i + 1), valores[i]);
+            for (Variable var : solution.getVariables()) {
+                System.out.printf("  %s = %.2f\n", var.getName(), var.getValue());
             }
 
-            System.out.println("================================\n");
+            System.out.println("==============================\n");
+        } else {
+            System.out.println("Problema não tem solução ótima!");
         }
     }
 }
@@ -541,10 +548,11 @@ ConsType.EQ  →  =
 ### Exemplo de uso:
 ```java
 // Restrição: 3x1 + 2x2 >= 10
-lp.addConstraint(
-    new Constraint(ConsType.GE, 10),
-    3, 2
-);
+constraints.add(new Constraint(
+    new double[]{3, 2},    // coeficientes
+    ConsType.GE,           // >=
+    10                     // lado direito
+));
 ```
 
 ---
@@ -556,23 +564,26 @@ public void problemaMinimizacao() throws Exception {
     System.out.println("Minimizar: 200x1 + 300x2");
     System.out.println("Sujeito a: 3x1 + 5x2 >= 35");
 
-    LP lp = new LP();
-
-    // IMPORTANTE: Por padrão é minimização
-    // Mas podemos explicitar:
-    lp.setObjFunctionMin();
-
-    // Função objetivo
-    lp.setCObj(200, 300);
-
-    // Restrição: 3x1 + 5x2 >= 35
-    lp.addConstraint(
-        new Constraint(ConsType.GE, 35),
-        3, 5
+    // Criar função objetivo (minimização)
+    LinearObjectiveFunction objective = new LinearObjectiveFunction(
+        new double[]{200, 300},
+        GoalType.MIN
     );
 
-    Solution solution = lp.solve();
-    exibirSolucao(solution);
+    // Criar lista de restrições
+    ListConstraints constraints = new ListConstraints();
+
+    // Restrição: 3x1 + 5x2 >= 35
+    constraints.add(new Constraint(
+        new double[]{3, 5},
+        ConsType.GE,
+        35
+    ));
+
+    // Criar e resolver
+    LP lp = new LP(objective, constraints);
+    SolutionType result = lp.resolve();
+    exibirSolucao(lp, result);
 }
 ```
 
@@ -763,9 +774,15 @@ A biblioteca SSC suporta:
 
 ### MILP (Mixed Integer Linear Programming)
 ```java
-LP lp = new LP();
-lp.setVariableType(1, VariableType.INTEGER);  // x1 inteira
-lp.setVariableType(2, VariableType.BINARY);   // x2 binária
+// Criar problema como de costume
+LinearObjectiveFunction objective = new LinearObjectiveFunction(...);
+ListConstraints constraints = new ListConstraints();
+// ... adicionar restrições ...
+
+// Usar classe MILP para variáveis inteiras
+MILP milp = new MILP(objective, constraints);
+// Configurar tipos de variáveis conforme necessário
+SolutionType result = milp.resolve();
 ```
 
 ### Special Ordered Sets (SOS)
@@ -873,22 +890,6 @@ Resolva o mesmo problema manualmente e com SSC. Verifique os resultados.
 
 **Prof. Alysson M. Bruno**
 Otimização de Sistemas - Unitins
-
----
-
-## Referências
-
-1. Dantzig, G. B. (1947). "Maximization of a linear function of variables subject to linear inequalities"
-
-2. Hillier, F. S., & Lieberman, G. J. "Introduction to Operations Research"
-
-3. SSC Documentation. "Software for Simplex Calculation". Available at: https://www.ssclab.org/
-
-4. Bazaraa, M. S., Jarvis, J. J., & Sherali, H. D. "Linear Programming and Network Flows"
-
-5. Chvatal, V. "Linear Programming"
-
-6. Winston, W. L. "Operations Research: Applications and Algorithms"
 
 ---
 

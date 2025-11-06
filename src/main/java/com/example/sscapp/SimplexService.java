@@ -27,23 +27,27 @@ public class SimplexService {
             System.out.println("========================================\n");
 
             // Criar o problema de programação linear
-            LP lp = new LP();
+            // Minimização: estrutura da função objetivo e restrições
+            LinearObjectiveFunction objective = new LinearObjectiveFunction(
+                new double[]{3, 2},
+                GoalType.MIN
+            );
 
-            // Definir a função objetivo (minimização)
-            lp.setCObj(3, 2);
+            // Criar lista de restrições
+            ListConstraints constraints = new ListConstraints();
 
-            // Adicionar restrições
             // 2x1 + x2 >= 4
-            lp.addConstraint(new Constraint(ConsType.GE, 4), 2, 1);
+            constraints.add(new Constraint(new double[]{2, 1}, ConsType.GE, 4));
 
             // x1 + 2x2 >= 3
-            lp.addConstraint(new Constraint(ConsType.GE, 3), 1, 2);
+            constraints.add(new Constraint(new double[]{1, 2}, ConsType.GE, 3));
 
-            // Resolver o problema
-            Solution solution = lp.solve();
+            // Criar e resolver o problema
+            LP lp = new LP(objective, constraints);
+            SolutionType result = lp.resolve();
 
             // Exibir resultados
-            displaySolution(solution);
+            displaySolution(lp, result);
 
         } catch (Exception e) {
             System.err.println("Erro ao resolver o problema: " + e.getMessage());
@@ -72,24 +76,27 @@ public class SimplexService {
             System.out.println("========================================\n");
 
             // Criar o problema de programação linear
-            LP lp = new LP();
+            // Maximização: estrutura da função objetivo e restrições
+            LinearObjectiveFunction objective = new LinearObjectiveFunction(
+                new double[]{5, 4},
+                GoalType.MAX
+            );
 
-            // Definir a função objetivo (maximização)
-            lp.setObjFunctionMax();
-            lp.setCObj(5, 4);
+            // Criar lista de restrições
+            ListConstraints constraints = new ListConstraints();
 
-            // Adicionar restrições
             // x1 + x2 <= 5
-            lp.addConstraint(new Constraint(ConsType.LE, 5), 1, 1);
+            constraints.add(new Constraint(new double[]{1, 1}, ConsType.LE, 5));
 
             // 3x1 + x2 <= 12
-            lp.addConstraint(new Constraint(ConsType.LE, 12), 3, 1);
+            constraints.add(new Constraint(new double[]{3, 1}, ConsType.LE, 12));
 
-            // Resolver o problema
-            Solution solution = lp.solve();
+            // Criar e resolver o problema
+            LP lp = new LP(objective, constraints);
+            SolutionType result = lp.resolve();
 
             // Exibir resultados
-            displaySolution(solution);
+            displaySolution(lp, result);
 
         } catch (Exception e) {
             System.err.println("Erro ao resolver o problema: " + e.getMessage());
@@ -123,24 +130,27 @@ public class SimplexService {
             System.out.println("========================================\n");
 
             // Criar o problema de programação linear
-            LP lp = new LP();
+            // Maximização: estrutura da função objetivo e restrições
+            LinearObjectiveFunction objective = new LinearObjectiveFunction(
+                new double[]{5, 4},
+                GoalType.MAX
+            );
 
-            // Definir a função objetivo (maximização)
-            lp.setObjFunctionMax();
-            lp.setCObj(5, 4);
+            // Criar lista de restrições
+            ListConstraints constraints = new ListConstraints();
 
-            // Adicionar restrições
             // x1 + x2 <= 10
-            lp.addConstraint(new Constraint(ConsType.LE, 10), 1, 1);
+            constraints.add(new Constraint(new double[]{1, 1}, ConsType.LE, 10));
 
             // 2x1 + x2 <= 16
-            lp.addConstraint(new Constraint(ConsType.LE, 16), 2, 1);
+            constraints.add(new Constraint(new double[]{2, 1}, ConsType.LE, 16));
 
-            // Resolver o problema
-            Solution solution = lp.solve();
+            // Criar e resolver o problema
+            LP lp = new LP(objective, constraints);
+            SolutionType result = lp.resolve();
 
             // Exibir resultados
-            displaySolution(solution);
+            displaySolution(lp, result);
 
             // Explicação adicional
             System.out.println("INTERPRETACAO:");
@@ -157,20 +167,30 @@ public class SimplexService {
     /**
      * Exibe a solução encontrada
      */
-    private void displaySolution(Solution solution) {
-        if (solution != null) {
-            System.out.println("STATUS: " + solution.getSolutionType());
-            System.out.println("\nValor otimo da funcao objetivo: " + solution.getOptimalValue());
+    private void displaySolution(LP lp, SolutionType result) {
+        System.out.println("STATUS: " + result);
 
-            double[] values = solution.getOptimalSolution();
+        if (result == SolutionType.OPTIMAL) {
+            Solution solution = lp.getSolution();
+            System.out.println("\nValor otimo da funcao objetivo: " + solution.getOptimumValue());
+
             System.out.println("\nValores das variaveis:");
-            for (int i = 0; i < values.length; i++) {
-                System.out.printf("  x%d = %.4f%n", (i + 1), values[i]);
+            for (Variable var : solution.getVariables()) {
+                System.out.printf("  %s = %.4f%n", var.getName(), var.getValue());
             }
 
             System.out.println("\n========================================");
+        } else if (result == SolutionType.UNBOUNDED) {
+            System.out.println("\nProblema ILIMITADO (unbounded)!");
+            System.out.println("A funcao objetivo pode crescer indefinidamente.");
+            System.out.println("========================================");
+        } else if (result == SolutionType.INFEASIBLE) {
+            System.out.println("\nProblema INVIAVEL (infeasible)!");
+            System.out.println("Nao existe solucao que satisfaca todas as restricoes.");
+            System.out.println("========================================");
         } else {
-            System.out.println("Nao foi possivel encontrar uma solucao!");
+            System.out.println("\nNao foi possivel encontrar uma solucao!");
+            System.out.println("========================================");
         }
     }
 }
