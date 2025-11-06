@@ -181,6 +181,8 @@ Uma empresa de logística precisa entregar mercadorias para duas cidades (A e B)
 - **Cidade A**: 15 toneladas
 - **Cidade B**: 20 toneladas
 
+---
+
 ### Restrições:
 - Máximo de 8 caminhões pequenos disponíveis
 - Máximo de 6 caminhões grandes disponíveis
@@ -301,6 +303,8 @@ Max Z = 5x₁ + 4x₂
         2x₁ + x₂ + s₂ = 16
 ```
 
+---
+
 ### Tableau Inicial:
 
 | Base | x₁  | x₂  | s₁  | s₂  | RHS |
@@ -321,6 +325,8 @@ Max Z = 5x₁ + 4x₂
 ### Teste da Razão (escolha da variável de saída):
 - Linha s₁: 10/1 = **10**
 - Linha s₂: 16/2 = **8** ← menor razão positiva
+
+---
 
 **Elemento pivô**: 2 (interseção de x₁ e s₂)
 
@@ -343,6 +349,8 @@ Max Z = 5x₁ + 4x₂
 - Linha x₁: 8/0.5 = 16
 
 **Elemento pivô**: 0.5 (interseção de x₂ e s₁)
+
+---
 
 ### Tableau Final:
 
@@ -692,19 +700,23 @@ ssc-terminal-app/src/main/java/com/example/sscapp/
 - Mix de produtos
 - Alocação de recursos
 
+---
+
+## Aplicações de Programação Linear (cont.)
+
 ### 3. Finanças
 - Otimização de portfólio
 - Gestão de riscos
 - Alocação de investimentos
 
----
-
-## Aplicações de Programação Linear (cont.)
-
 ### 4. Agricultura
 - Planejamento de cultivo
 - Uso de fertilizantes
 - Irrigação
+
+---
+
+## Aplicações de Programação Linear (cont.)
 
 ### 5. Telecomunicações
 - Roteamento de chamadas
